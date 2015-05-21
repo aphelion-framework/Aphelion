@@ -37,11 +37,24 @@ class Application
         $this->router = new Router($this->loadRoutes());
 
         $uri = filter_input(INPUT_SERVER, 'REQUEST_URI');
+        $method = filter_input(INPUT_SERVER, 'REQUEST_METHOD');
 
         list($uri) = explode('?', $uri);
 
-        if ($this->router->match($uri)) {
-            $matchedRoutes = $this->router->getMatchedRoutes();
+        if ($this->router->match($uri, $method)) {
+            $matchedRoute = $this->router->getMatchedRoute();
+
+            $controllerClass = $matchedRoute->getRoute()->getController();
+            $action = $matchedRoute->getRoute()->getAction();
+            $params = $matchedRoute->getParams();
+
+            // @todo use a service locator
+            $controller = new $controllerClass();
+            $result = call_user_func_array([$controller, $action], $params);
+
+            var_dump($result);
+            exit;
+
         } else {
             // 404
             die('404');
@@ -71,7 +84,7 @@ class Application
         $annotationBuilder = new AnnotationBuilder();
 
         foreach ($controllers as $controllerClass) {
-            $annotationBuilder->createRoute($controllerClass);
+            $routes = array_merge($routes, $annotationBuilder->createRoutes($controllerClass));
         }
 
         return $routes;

@@ -20,7 +20,7 @@ class IndexController
 
     /**
      * @Route\Name("foo")
-     * @Route\Route("/nested/foo/:id[/]", {"constraints":{"id": "[0-9]+"}})
+     * @Route\Route("/nested/foo/(:id)[/]", {"constraints":{"id": "[0-9]+"}})
      * @Route\Method("GET")
      */
     public function fooAction($id)
@@ -30,7 +30,7 @@ class IndexController
 
     /**
      * @Route\Name("foo")
-     * @Route\Route("/nested/foo/:id[/]", {"constraints":{"id": "[0-9]+"}})
+     * @Route\Route("/nested/foo/(:id)[/]", {"constraints":{"id": "[0-9]+"}})
      * @Route\Method("POST")
      */
     public function fooPostAction($id)

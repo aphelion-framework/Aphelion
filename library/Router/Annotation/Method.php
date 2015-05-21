@@ -5,7 +5,7 @@ namespace Aphelion\Router\Annotation;
 /**
  * @Annotation
  */
-class Name
+class Method
 {
     private $data;
 
@@ -14,7 +14,7 @@ class Name
         $this->data = $data;
     }
 
-    public function getName()
+    public function getMethod()
     {
         return $this->data['value'];
     }

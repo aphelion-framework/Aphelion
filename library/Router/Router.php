@@ -13,30 +13,38 @@ class Router/* implements RouterInterface */
     private $routes = [];
 
     /**
-     * @var array
+     * @var RouteMatch
      */
-    private $matchedRoutes = [];
+    private $matchedRoute;
 
     public function __construct(array $routes)
     {
         $this->routes = $routes;
     }
 
-    public function match($uri)
+    public function match($uri, $method)
     {
-        $this->matchedRoutes = [];
-
+        /** @var Route $route */
         foreach ($this->routes as $route) {
-            if ($route->matches($uri)) {
-                $this->matchedRoutes[] = $route;
+
+            if ($route->matches($uri, $method)) {
+
+                $this->matchedRoute = new RouteMatch();
+                $this->matchedRoute->setRoute($route);
+                $this->matchedRoute->setParams($route->getParams());
+
+                return true;
             }
         }
 
-        return !empty($this->matchedRoutes);
+        return false;
     }
 
-    public function getMatchedRoutes()
+    /**
+     * @return RouteMatch
+     */
+    public function getMatchedRoute()
     {
-        return $this->matchedRoutes;
+        return $this->matchedRoute;
     }
 }

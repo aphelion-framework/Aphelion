@@ -2,6 +2,7 @@
 
 namespace Aphelion\Router;
 
+use Aphelion\Router\Annotation;
 use Doctrine\Common\Annotations\AnnotationReader;
 
 /**
@@ -9,6 +10,9 @@ use Doctrine\Common\Annotations\AnnotationReader;
  */
 class AnnotationBuilder
 {
+    /**
+     * @var AnnotationReader
+     */
     protected $reader;
 
     public function setReader(AnnotationReader $reader)
@@ -16,6 +20,10 @@ class AnnotationBuilder
         $this->reader = $reader;
     }
 
+
+    /**
+     * @return AnnotationReader
+     */
     public function getReader()
     {
         if ($this->reader === null) {
@@ -25,16 +33,47 @@ class AnnotationBuilder
         return $this->reader;
     }
 
-    public function createRoute($class)
+    public function createRoutes($class)
     {
+        $routes = [];
+
         $reflected = new \ReflectionClass($class);
 
         $classAnnotations = $this->getReader()->getClassAnnotations($reflected);
 
-        var_dump($classAnnotations);
-
-        foreach ($reflected->getProperties() as $property) {
-
+        $name = null;
+        foreach ($classAnnotations as $annotation) {
+            if ($annotation instanceof Annotation\Name) {
+                $name = $annotation->getName();
+            }
         }
+
+        foreach ($reflected->getMethods() as $method) {
+            $annotations = $this->getReader()->getMethodAnnotations($method);
+
+            $route = new Route();
+            $route->setController($class);
+            $route->setAction($method->getName());
+
+            foreach ($annotations as $annotation) {
+                if ($annotation instanceof Annotation\Name) {
+                    $routeName = trim($name . '/' . $annotation->getName(), '/');
+                    $route->setName($routeName);
+                }
+
+                if ($annotation instanceof Annotation\Method) {
+                    $route->addMethod($annotation->getMethod());
+                }
+
+                if ($annotation instanceof Annotation\Route) {
+                    $route->setRoute($annotation->getRoute());
+                    $route->setConstraints($annotation->getConstraints());
+                }
+            }
+
+            $routes[] = $route;
+        }
+
+        return $routes;
     }
 }
