@@ -1,12 +1,21 @@
 <?php
 
-namespace Aphelion\Router;
+namespace Aphelion\Router\Http\Route;
+
+use Aphelion\Router\Runnable;
 
 /**
  * Route
+ *
+ * @author Rob Caiger <rob@clocal.co.uk>
  */
-class Route/* implements RouteInterface */
+class Route
 {
+    const METHOD_GET = 'GET';
+    const METHOD_PUT = 'PUT';
+    const METHOD_POST = 'POST';
+    const METHOD_DELETE = 'DELETE';
+
     private $name;
 
     private $methods = [];
@@ -15,15 +24,16 @@ class Route/* implements RouteInterface */
 
     private $constraints;
 
-    private $controller;
-
-    private $action;
-
     private $regex;
 
     private $params = [];
 
     private $possibleParams = [];
+
+    /**
+     * @var Runnable
+     */
+    private $runnable;
 
     /**
      * @return mixed
@@ -88,38 +98,6 @@ class Route/* implements RouteInterface */
     public function setConstraints($constraints)
     {
         $this->constraints = $constraints;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getController()
-    {
-        return $this->controller;
-    }
-
-    /**
-     * @param mixed $controller
-     */
-    public function setController($controller)
-    {
-        $this->controller = $controller;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getAction()
-    {
-        return $this->action;
-    }
-
-    /**
-     * @param mixed $action
-     */
-    public function setAction($action)
-    {
-        $this->action = $action;
     }
 
     public function matches($uri, $method)
@@ -217,5 +195,18 @@ class Route/* implements RouteInterface */
         }
 
         return $regex;
+    }
+
+    public function setRunnable(Runnable $runnable)
+    {
+        $this->runnable = $runnable;
+    }
+
+    /**
+     * @todo this needs moving
+     */
+    public function run()
+    {
+        return $this->runnable->run($this->getParams());
     }
 }

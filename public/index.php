@@ -5,4 +5,7 @@ ini_set('display_errors', 1);
 
 $loader = require(__DIR__ . '/../vendor/autoload.php');
 
-(new \Aphelion\Application\Application())->run(include(__DIR__ . '/../config/application.config.php'), $loader);
+define('APP_ROUTE', realpath(__DIR__ . '/../application/'));
+
+$application = \Aphelion\Application::instance();
+$application->run();
